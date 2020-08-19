@@ -17,7 +17,7 @@ const auth = (req, res, next) => {
     }
 
     req.token = token;
-    req.uset = token;
+    req.user = user;
     next();
   });
 };
