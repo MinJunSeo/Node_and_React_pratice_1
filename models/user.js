@@ -51,7 +51,7 @@ userSchema.pre('save', async function(next) {
   }
 });
 
-// 사용자 지정 method 정의하기
+// 평문 비밀번호를 암호화된 비밀번호와 동일한 비밀번호인지 비교
 userSchema.methods.comparePassword = function(plainPassword, callback) {
   bcrypt.compare(plainPassword, this.password, function(err, isMatch) {
     if (err) {
@@ -72,6 +72,20 @@ userSchema.methods.generateToken = function(callback) {
       return callback(err);
     }
     callback(null, user);
+  });
+};
+
+userSchema.statics.findByToken = function(token, callback) {
+  const user = this;
+  
+  // 토큰을 decode한다.
+  jwt.verify(token, 'secretToken', function(err, decoded) {
+    user.findOne({ "_id": decoded, "token": token }, function(err, user) {
+      if (err) {
+        return callback(err);
+      }
+      callback(null, user);
+    });
   });
 };
 
